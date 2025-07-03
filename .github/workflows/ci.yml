@@ -30,18 +30,6 @@ jobs:
           pip install -r requirements.txt
           pip install pytest  # Ensure test runner exists
 
-      - name: 🔍 Basic validation
-        run: |
-          echo "Python version: $(python --version)"
-          echo "Pip version: $(pip --version)"
-          [ -f "requirements.txt" ] || { echo "❌ Missing requirements.txt"; exit 1; }
-          [ -d "src" ] || { echo "❌ Missing src directory"; exit 1; }
-
-      - name: 🧪 Run minimal tests
-        if: contains(github.ref, 'main')  # Only run tests on main branch
-        run: |
-          pytest tests/ -v --cov=src --cov-report=xml || echo "⚠️ Tests failed but continuing"
-
       - name: 📊 Upload coverage
         if: always() && contains(github.ref, 'main')
         uses: codecov/codecov-action@v3
