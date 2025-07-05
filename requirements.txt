@@ -9,3 +9,5 @@ faiss-cpu
 openai
 tqdm
 langchain
+transformers
+
