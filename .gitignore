@@ -8,6 +8,8 @@ __pycache__/
 # project specific
 data/
 *.csv
+
+vector_store/
 # Distribution / packaging
 .Python
 build/
