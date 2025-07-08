@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from sentence_transformers import SentenceTransformer
 import torch
 from collections import defaultdict
-
+from transformers import pipeline
 # ==================== Configuration ====================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VECTOR_STORE_PATH = os.path.join(BASE_DIR, "vector_store")
@@ -13,7 +13,11 @@ FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_PATH, "faiss_index")
 METADATA_PATH = os.path.join(VECTOR_STORE_PATH, "metadata.pkl")
 
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL_NAME = "google/flan-t5-small"
+model1="google/flan-t5-small"
+model2="google/flan-t5-base"
+model3="google/flan-t5-large"
+model="mistral-7b-instruct"
+LLM_MODEL_NAME = model2
 
 TOP_K = 5
 MAX_GENERATION_TOKENS = 300
@@ -68,20 +72,14 @@ def build_prompt(context_chunks, user_question):
     context = "\n---\n".join(c['chunk_text'] for c in context_chunks[:3])
     return PROMPT_TEMPLATE.format(context=context, question=user_question)
 
+
 def generate_llm_answer(components, user_question, context_chunks):
     prompt = build_prompt(context_chunks, user_question)
-    tokenizer = components['tokenizer']
-    model = components['model']
+    generator = pipeline("text2text-generation", model=LLM_MODEL_NAME, tokenizer=LLM_MODEL_NAME, device=0 if torch.cuda.is_available() else -1)
 
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True).to(device)
-    outputs = model.generate(
-        **inputs,
-        max_new_tokens=MAX_GENERATION_TOKENS,
-        do_sample=True,
-        top_p=0.9,
-        temperature=0.7
-    )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+    response = generator(prompt, max_new_tokens=MAX_GENERATION_TOKENS, do_sample=True, top_p=0.9, temperature=0.7)
+    return response[0]['generated_text']
+
 
 def retrieve_top_k_chunks(components, question, k=TOP_K):
     query_vec = components['embedder'].encode([question], convert_to_tensor=True)
