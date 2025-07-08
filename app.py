@@ -1,196 +1,148 @@
-# app.py
 import streamlit as st
-import time  # For simulating streaming delay
+import time
+from typing import List, Dict, Generator
 
-# --- MOCKING generator functions for demonstration purposes ---
+# ---------------------- Mocked Backend Logic ---------------------- #
 
-def initialize_system():
+def initialize_system() -> Dict:
+    """
+    Mock system initialization. Replace with real init logic.
+    """
     st.info("✅ System initialized.")
     return {"status": "initialized", "llm_client": "mock_llm"}
 
-def retrieve_top_k_chunks(components, query):
+def retrieve_top_k_chunks(components: Dict, query: str) -> List[Dict]:
+    """
+    Mock retrieval function. Replace with real chunk retrieval logic.
+    """
     query_lower = query.lower()
-    if query_lower in ["hi", "hello", "hey"]:
-        return [{"chunk_text": "Hello! Ask me about customer complaints regarding credit cards, loans, or transfers."}]
 
     if "loan" in query_lower or "interest" in query_lower:
         return [
-            {"chunk_text": "Customer complained about predatory interest rates on their personal loan, stating they felt misled by the initial offer."},
-            {"chunk_text": "The terms and conditions for the credit card were not clearly explained, leading to unexpected fees."},
-            {"chunk_text": "A user reported difficulty understanding the repayment schedule for their home loan, causing confusion and stress."},
-            {"chunk_text": "Unclear eligibility criteria caused multiple loan application rejections."},
-            {"chunk_text": "Delayed loan disbursement created financial stress for applicants."}
+            {"chunk_text": "Complaint about predatory interest rates on personal loans."},
+            {"chunk_text": "Confusion about credit card interest fees."},
+            {"chunk_text": "Loan disbursement delay during urgent need."}
         ]
-    elif "fraud" in query_lower or "unauthorized" in query_lower:
+    elif "fraud" in query_lower:
         return [
-            {"chunk_text": "Customers reported multiple unauthorized charges on their credit cards."},
-            {"chunk_text": "Delayed fraud resolution left users dissatisfied."},
-            {"chunk_text": "Fraud department was hard to reach, and communication was inconsistent."}
-        ]
-    elif "close" in query_lower or "closure" in query_lower or "account" in query_lower:
-        return [
-            {"chunk_text": "Users faced hidden fees during account closure."},
-            {"chunk_text": "Account closures were processed without proper notifications."},
-            {"chunk_text": "Some customers reported account closure requests being ignored or delayed."}
-        ]
-    elif "transfer" in query_lower or "money transfer" in query_lower:
-        return [
-            {"chunk_text": "Transfers were delayed for multiple users, especially during weekends."},
-            {"chunk_text": "Funds were deducted but not received by the recipient, causing concern."},
-            {"chunk_text": "Poor customer service response to transfer issues caused frustration."}
+            {"chunk_text": "Unauthorized credit card charges reported."},
+            {"chunk_text": "Fraud claim not resolved for over 2 weeks."}
         ]
     elif "credit card" in query_lower:
         return [
-            {"chunk_text": "Annual fees for credit cards were not disclosed upfront."},
-            {"chunk_text": "Users faced difficulty disputing charges on their CrediTrust credit card."},
-            {"chunk_text": "Unexpected interest charges despite timely payments."}
-        ]
-    elif "pain point" in query_lower or "problem" in query_lower or "issue" in query_lower:
-        return [
-            {"chunk_text": "Loan approval delays and unclear terms are frequent issues."},
-            {"chunk_text": "Customer service response time and fraud resolution also frustrate users."},
-            {"chunk_text": "Platform navigation and digital access inconsistencies cause confusion."}
+            {"chunk_text": "Unexpected annual fees and chargeback issues on credit card."}
         ]
     else:
         return []
 
-def generate_llm_answer_stream(components, user_input, chunks):
-    joined_chunks = " ".join([c["chunk_text"].lower() for c in chunks])
-
-    # Custom handling for greetings
-    if any(greet in user_input.lower() for greet in ["hi", "hello", "hey"]):
-        summary_topic = (
-            "**Insight:** Hi there! I'm your assistant for exploring customer complaints. "
-            "Ask me about issues like credit card disputes, loan delays, fraud reports, and more."
-        )
-    elif "fraud" in joined_chunks or "unauthorized" in joined_chunks:
-        summary_topic = (
-            "**Insight:** Based on the retrieved complaints, customers are frustrated with delayed fraud resolution "
-            "and multiple unauthorized charges. Timely and transparent fraud handling processes would improve trust and satisfaction."
-        )
-    elif "close" in joined_chunks or "closure" in joined_chunks:
-        summary_topic = (
-            "**Insight:** Customers express concerns about hidden fees and poor communication during account closures. "
-            "Ensuring clear procedures and timely updates could reduce dissatisfaction."
-        )
-    elif "loan" in joined_chunks or "interest" in joined_chunks:
-        summary_topic = (
-            "**Insight:** Customers are concerned about unclear loan terms, high interest rates, and loan disbursement delays. "
-            "Transparency in product disclosures and streamlined application processes are key improvement areas."
-        )
-    elif "transfer" in joined_chunks:
-        summary_topic = (
-            "**Insight:** Customers frequently report delays and failures in money transfers. Improving backend processing times "
-            "and better customer support during transaction failures can boost user confidence."
-        )
-    elif "credit card" in joined_chunks:
-        summary_topic = (
-            "**Insight:** Common issues with credit cards include hidden fees, unexpected charges, and dispute resolution difficulties. "
-            "Greater fee transparency and robust support channels can enhance user trust."
-        )
-    else:
-        summary_topic = (
-            "**Insight:** Based on provided complaints, users experience diverse challenges across products. Clear communication, responsive support, "
-            "and fair financial practices are consistent areas for improvement."
-        )
-
-    for word in summary_topic.split(" "):
+def generate_llm_answer_stream(components: Dict, user_input: str, chunks: List[Dict]) -> Generator[str, None, None]:
+    """
+    Mock streamed generation. Replace with actual LLM streaming if needed.
+    """
+    mock_answer = "Based on retrieved complaints, customers often experience unclear terms and delayed resolutions."
+    for word in mock_answer.split():
         yield word + " "
         time.sleep(0.03)
 
-
-def extract_key_phrases(text):
+def extract_key_phrases(text: str) -> str:
     return text[:100] + "..." if len(text) > 100 else text
 
-# --- UI Initialization ---
+# ---------------------- Streamlit UI ---------------------- #
 
-if "components" not in st.session_state:
-    st.session_state["components"] = initialize_system()
-components = st.session_state["components"]
-
-st.set_page_config(page_title="CrediTrust Complaint InsightBot", layout="centered")
-st.markdown("""
-    <h1 style='position: fixed; top: 0; left: 0; width: 100%; padding: 0.5rem 15rem; background-color: black; border-bottom: 1px solid #ddd; z-index: 999;'>🔍 CrediTrust Complaint InsightBot</h1>
+def render_header():
+    st.markdown("""
+    <h1 style='position: fixed; top: 0; left: 0; width: 100%; padding: 0.5rem 15rem;
+    background-color: black; color: white; z-index: 999;'>🔍 CrediTrust Complaint InsightBot</h1>
     <div style='height: 4rem'></div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+    st.markdown("Ask about customer issues across products like credit cards, loans, and transfers.")
 
-st.markdown("Ask about customer issues across products like credit cards, loans, and transfers.")
+def render_messages():
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "current_input" not in st.session_state:
-    st.session_state.current_input = ""
+def render_sources(chunks: List[Dict]):
+    if chunks:
+        st.markdown("### 📌 Top Retrieved Complaints:")
+        for i, chunk in enumerate(chunks, 1):
+            snippet = extract_key_phrases(chunk.get("chunk_text", ""))
+            st.markdown(f"- **Complaint {i}:** {snippet}")
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# ---------------------- App Logic ---------------------- #
 
-user_input_placeholder = st.empty()
-user_input_text = user_input_placeholder.text_input(
-    "💬 Enter your question:",
-    value=st.session_state.current_input,
-    key="user_input_text_box",
-    on_change=lambda: st.session_state.update(current_input=st.session_state.user_input_text_box)
-)
-
-col1, col2 = st.columns([1, 1])
-submit_button = col1.button("Ask", key="ask_button")
-clear_button = col2.button("Clear", key="clear_button")
-
-if clear_button:
-    st.session_state.messages = []
-    st.session_state.current_input = ""
-    st.rerun()
-
-if submit_button or (user_input_text and st.session_state.current_input != user_input_text):
+def handle_submission():
     query = st.session_state.current_input.strip()
+    if not query:
+        return
 
-    if query:
-        st.session_state.messages.append({"role": "user", "content": query})
-        with st.chat_message("user"):
-            st.markdown(query)
+    st.session_state.messages.append({"role": "user", "content": query})
+    st.session_state.submitted = True
+    st.session_state.current_input = ""  # Clear input after submission
 
+def main():
+    st.set_page_config(page_title="CrediTrust Complaint InsightBot", layout="centered")
+
+    # ---- State Initialization ----
+    if "components" not in st.session_state:
+        st.session_state.components = initialize_system()
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    if "current_input" not in st.session_state:
         st.session_state.current_input = ""
-        user_input_placeholder.text_input("💬 Enter your question:", value="", key="user_input_text_box_cleared")
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
 
-        if not components:
-            error_msg = "System failed to initialize."
-            st.error(error_msg)
-            st.session_state.messages.append({"role": "assistant", "content": error_msg})
-        else:
-            with st.spinner("🔍 Analyzing complaints..."):
-                try:
-                    chunks = retrieve_top_k_chunks(components, query)
-                    ai_response_content = ""
+    render_header()
+    render_messages()
 
-                    if not chunks:
-                        ai_response_content = ("❌ No relevant complaints found for that question.\n\n"
-                                               "👉 Try rephrasing or ask about a specific issue like:\n"
-                                               "- 'What are common complaints about credit card billing?'\n"
-                                               "- 'Are there issues with loan approval delays?'")
-                        with st.chat_message("assistant"):
-                            st.warning(ai_response_content)
-                    else:
-                        sources_markdown = "### 📌 Top Retrieved Complaints:\n"
-                        for i, c in enumerate(chunks, 1):
-                            sources_markdown += f"- **Complaint {i}:** {extract_key_phrases(c['chunk_text'])}\n"
+    # ---- Input & Buttons ----
+    user_input = st.text_input(
+        "💬 Enter your question:",
+        value=st.session_state.current_input,
+        key="user_input_text_box",
+        on_change=lambda: st.session_state.update(current_input=st.session_state.user_input_text_box)
+    )
 
-                        with st.chat_message("assistant"):
-                            st.markdown("## 💡 **AI Insight**")
-                            answer_placeholder = st.empty()
-                            full_answer = ""
-                            for chunk in generate_llm_answer_stream(components, query, chunks):
-                                full_answer += chunk
-                                answer_placeholder.markdown(full_answer)
+    col1, col2 = st.columns([1, 1])
+    ask_disabled = not st.session_state.current_input.strip()
+    submit_button = col1.button("Ask", disabled=ask_disabled, on_click=handle_submission)
+    clear_button = col2.button("Clear", on_click=lambda: st.session_state.update(messages=[], current_input="", submitted=False))
 
-                            st.markdown(sources_markdown)
-                            ai_response_content = f"## 💡 **AI Insight**\n{full_answer}\n\n{sources_markdown}"
+    # ---- Handle Submission ----
+    if st.session_state.submitted:
+        st.session_state.submitted = False  # reset flag after handling
 
-                    st.session_state.messages.append({"role": "assistant", "content": ai_response_content})
+        query = st.session_state.messages[-1]["content"]
+        components = st.session_state.components
 
-                except Exception as e:
-                    error_message = f"❗ Error: {e}"
-                    st.error(error_message)
-                    st.session_state.messages.append({"role": "assistant", "content": error_message})
+        with st.spinner("🔍 Analyzing complaints..."):
+            try:
+                chunks = retrieve_top_k_chunks(components, query)
 
-    st.rerun()
+                if not chunks:
+                    assistant_reply = (
+                        "❌ No relevant complaints found.\n\n"
+                        "Try asking about something more specific, like:\n"
+                        "- 'Common issues with loan disbursement?'\n"
+                        "- 'Any fraud reports on money transfers?'"
+                    )
+                else:
+                    answer_placeholder = st.empty()
+                    full_answer = ""
+                    for piece in generate_llm_answer_stream(components, query, chunks):
+                        full_answer += piece
+                        answer_placeholder.markdown(full_answer)
+
+                    render_sources(chunks)
+                    assistant_reply = f"## 💡 AI Insight\n\n{full_answer}"
+
+                st.session_state.messages.append({"role": "assistant", "content": assistant_reply})
+
+            except Exception as e:
+                error_msg = f"❗ Error: {e}"
+                st.error(error_msg)
+                st.session_state.messages.append({"role": "assistant", "content": error_msg})
+
+if __name__ == "__main__":
+    main()
