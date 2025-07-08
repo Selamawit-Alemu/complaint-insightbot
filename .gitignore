@@ -8,7 +8,7 @@ __pycache__/
 # project specific
 data/
 *.csv
-
+*.jar
 vector_store/
 # Distribution / packaging
 .Python
