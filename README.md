@@ -133,6 +133,7 @@ Features:
 
 ![UI Screenshot](UI_Screenshots/Screenshot-8.png)
 ![UI Screenshot](UI_Screenshots/Screenshot-9.png)
+
 ## 🛠️ Setup Instructions
 
 ```bash
