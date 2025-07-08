@@ -115,8 +115,8 @@ Stored in: `vector_store/` directory
 **Tool:** `src/generator.py`
 
 **Example Query:**
-```bash
-"Why are customers unhappy with their savings accounts?"
+
+    "Why are customers unhappy with their savings accounts?"
 
 ## 🌐 Streamlit UI 
 
@@ -136,7 +136,7 @@ Features:
 
 ## 🛠️ Setup Instructions
 
-```bash
+
 # 1. Create and activate virtual environment
     python -m venv venv
     source venv/bin/activate        # Windows: venv\Scripts\activate
