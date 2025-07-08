@@ -137,18 +137,18 @@ Features:
 ## 🛠️ Setup Instructions
 
 
-# 1. Create and activate virtual environment
+1. Create and activate virtual environment
     python -m venv venv
     source venv/bin/activate        # Windows: venv\Scripts\activate
 
-# 2. Install dependencies
+2. Install dependencies
     pip install -r requirements.txt
 
-# 3. Run chunking & indexing (if needed)
+3. Run chunking & indexing (if needed)
     python src/chunk_embed_index.py
 
-# 4. Run generator CLI
+4. Run generator CLI
     python src/generator.py
 
-# 5. Run Streamlit UI (optional)
+5. Run Streamlit UI (optional)
     streamlit run app.py
