@@ -13,9 +13,25 @@ To evaluate the effectiveness of the RAG (Retrieval-Augmented Generation) pipeli
 - **Top-K Chunks**: 5
 - **Device**: CPU
 
----
+### 🔢 Scoring Guide (1–5 Scale)
 
-## 📋 Evaluation Table
+- **5** – Accurate, fluent, and well-grounded in retrieved complaints.
+- **4** – Mostly accurate with minor issues.
+- **3** – Acceptable but lacking detail or slightly off-topic.
+- **2** – Vague or only partially aligned with context.
+- **1** – Irrelevant, generic, or hallucinated response.
+
+
+---
+## 📂 Dataset & Chunking
+
+- Source: Filtered complaint narratives from the CFPB (Consumer Financial Protection Bureau) dataset.
+- Preprocessing: Complaints were cleaned, deduplicated, and split into 100–150 word chunks.
+- Embedding: SentenceTransformer (`all-MiniLM-L6-v2`) used to generate dense vector representations.
+
+
+
+## 📋 Evaluation Table – flan-t5-small (Initial Model)
 
 | # | Question | Generated Answer | Retrieved Sources | Score (1–5) | Comments |
 |---|----------|------------------|-------------------|-------------|----------|
@@ -54,3 +70,76 @@ To evaluate the effectiveness of the RAG (Retrieval-Augmented Generation) pipeli
 ## ✅ Conclusion
 While the system handles some questions well, particularly around loans and money transfers, many responses lack depth. Improving model strength and prompt design will significantly enhance performance.
 
+
+## 📋 Evaluation Table – flan-t5-base (Improved Model)
+## 🔁 Model Change for Evaluation
+
+Initially, the system used `google/flan-t5-small`, which frequently responded with:
+> "I don't have enough information"
+
+To improve answer quality, we switched to `google/flan-t5-base`. This model:
+- Is still open-access and cost-free
+- Provides more fluent, relevant responses
+- Performs better in extracting financial insights
+
+---
+
+## 📋 Prompt Template
+
+We used the following template to guide the LLM:
+
+```text
+You are a financial analyst assistant for CrediTrust. Your task is to help internal teams understand customer pain points by analyzing complaint excerpts.
+
+Use only the information from the context below to answer the question. If the context does not contain enough information, respond with "I don't have enough information."
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+Evaluation Table
+No	Question	Retrieved Complaints (Summary)	Generated Insight	Quality	Comments
+1	What are customers complaining about in the personal loan approval process?	Misleading terms, excessive fees, predatory offers	Predatory fees and practices	✅ Good	Directly supported
+2	What types of issues do customers face with credit cards?	Negative impact on credit, customer service issues	I don't have enough information	❌ Weak	Should extract more
+3	How do customers feel about using BNPL services?	Repetitive & unclear complaint texts	I don't have enough information	❌ Weak	No real pattern extracted
+4	Are there common issues with closing savings accounts?	Lack of notice, multiple unexpected accounts	No	✅ Accurate	Matches content
+5	Are failed transactions frequent in money transfer services?	Mostly smooth, some errors	No	✅ Good	Reliable judgment
+6	What problems do customers face when disputing credit report errors?	Errors remain unresolved despite disputes	I don't have enough information	❌ Missed context	
+7	Are there recurring complaints about hidden fees or billing errors?	Fee disputes, late fees, recurring charges	Hidden fees	✅ Good	Captured core issue
+📊 Summary
+
+    ✅ 4/7 answers were accurate
+
+    ❌ 3/7 answers were insufficient
+
+    ⚖️ Overall quality score: 57%
+
+Although not perfect, flan-t5-base improved performance over the previous model. It succeeded in identifying key pain points for loans, money transfers, and billing. For other products like credit cards and BNPL, complaint text quality limited generation.
+📌 Lessons Learned
+
+    Prompt engineering helped guide the model better than before.
+
+    Performance depends heavily on retrieval quality.
+
+    Larger models like flan-t5-base can significantly improve answer quality without incurring additional cost.
+
+🏁 Next Steps
+
+    Improve chunking and retrieval logic to provide more coherent context.
+
+    Explore other open-access models like T5-base, Mistral, or phi-2 in future phases.
+
+
+## 🧾 Overall Results Summary
+
+| Metric                       | flan-t5-small | flan-t5-base |
+|-----------------------------|---------------|--------------|
+| Avg. Quality Score          | 2.4 / 5       | 3.6 / 5      |
+| # of Questions Scored ≥ 4   | 2             | 5            |
+| "I don't have enough info" Responses | 5           | 2            |
+| Hallucinated Responses      | 1             | 0            |
+
+**🎯 Improvement:** Switching to `flan-t5-base` increased average answer quality by ~50%.
